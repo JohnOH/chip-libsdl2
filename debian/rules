@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-SHLIBVER = 2.0.0
+SHLIBVER = 2.0.4
 
 DEB_HOST_ARCH_CPU ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_CPU)
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
@@ -8,6 +8,7 @@ DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 confflags = --disable-rpath --enable-sdl-dlopen --disable-loadso \
             --disable-nas --disable-esd --disable-arts \
             --disable-alsa-shared --disable-pulseaudio-shared \
+            --enable-ibus \
             --disable-x11-shared --disable-video-directfb \
             --enable-video-opengles \
             --disable-pulseaudio --disable-esd --disable-video-mir --disable-video-wayland --disable-video-opengl
@@ -32,6 +33,9 @@ endif
 ifeq (hurd,$(findstring hurd,$(DEB_HOST_ARCH_CPU)))
   confflags += --disable--video-opengles
 endif
+
+# for reproducible builds, timestamps_in_tarball
+SOURCE_DATE := $(shell dpkg-parsechangelog --show-field=Date)
 
 
 %:
@@ -67,13 +71,20 @@ override_dh_autoreconf:
 override_dh_auto_configure:
 	dh_auto_configure -- $(confflags)
 
-override_dh_auto_build:
-	dh_auto_build
-	tar czf debian/examples.tar.gz test
+override_dh_auto_build-indep:
+	GZIP="-9n" tar czf debian/examples.tar.gz test --owner=0 --group=0 --mode=go=rX,u+rw,a-s --clamp-mtime --mtime="$(SOURCE_DATE)" --sort=name
+	doxygen docs/doxyfile
+	# useless files
+	find output -name "*.md5" -delete
+	find output -type d -empty -delete
 
-override_dh_auto_clean:
+	find output -name "jquery.js" -delete
+	dh_link -plibsdl2-doc usr/share/javascript/jquery/jquery.js usr/share/doc/libsdl2-doc/html/jquery.js
+
+override_dh_auto_clean-indep:
 	dh_auto_clean
 	rm -f debian/examples.tar.gz
+	rm -rf output
 
 override_dh_install:
 	dh_install --fail-missing -XlibSDL2.la
@@ -81,11 +92,11 @@ override_dh_install:
 override_dh_link:
         # to address lintian warning
         # W: libsdl2-2.0-0: dev-pkg-without-shlib-symlink usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.0.0 usr/lib/x86_64-linux-gnu/libSDL2-2.0.so
-	dh_link -plibsdl2-dev usr/lib/$(DEB_HOST_MULTIARCH)/libSDL2-2.0.so.0.2.0 usr/lib/$(DEB_HOST_MULTIARCH)/libSDL2-2.0.so
+	dh_link -plibsdl2-dev usr/lib/$(DEB_HOST_MULTIARCH)/libSDL2-2.0.so.0.4.1 usr/lib/$(DEB_HOST_MULTIARCH)/libSDL2-2.0.so
 	dh_link --remaining-packages
-
-override_dh_strip:
-	dh_strip --dbg-package=libsdl2-dbg
 
 override_dh_makeshlibs:
 	dh_makeshlibs -V"libsdl2-2.0-0 (>= $(SHLIBVER))"
+
+override_dh_strip:
+	dh_strip --dbgsym-migration='libsdl2-dbg (<< 2.0.4+dfsg2-1~)'

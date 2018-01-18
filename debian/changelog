@@ -1,8 +1,96 @@
-libsdl2 (2.0.2+ntc-1) unstable; urgency=medium
+libsdl2 (2.0.5+dfsg1-2) unstable; urgency=medium
 
-  * Rebuild for CHIP, with GL stuff.
+  * Team Upload.
+  * Fix broken link (Closes: #849297)
+    - thanks Ben Longbons for the bug report!
 
- -- Ben Young <software@nextthing.co>  Mon, 12 Dec 2016 21:09:50 -0800
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Tue, 27 Dec 2016 18:11:10 +0100
+
+libsdl2 (2.0.5+dfsg1-1) unstable; urgency=low
+
+  * New upstream release
+    - Drop (all) debian/patches, there had been originally backported from
+      upstream or are now applied there:
+      * replace-relicenced-SDL_qsort.patch
+      * SDL2_dont_propagate_lpthread.diff (included in 2.0.4 already, but not
+        dropped then)
+      * bug_822210_fix_sdl2-config.cmake_whitespace.patch
+  * d/control: add Build-Depend on wayland-protocols, needed by the new version
+
+ -- Manuel A. Fernandez Montecelo <mafm@debian.org>  Wed, 02 Nov 2016 01:20:36 +0100
+
+libsdl2 (2.0.4+dfsg2-1) unstable; urgency=medium
+
+  [ Manuel A. Fernandez Montecelo ]
+  * Bump Policy Standards-Version to 3.9.8 (no changes needed)
+  * Drop -dbg package
+  * Fixes for reproducible builds:
+    - timestamps_in_tarball, use --clamp-mtime with changelog as date
+    - timestamps_in_gzip_headers, export GZIP="-9n"
+    - sort files by name when creating "examples.tar.gz"
+  * Add depends from -doc on libjs-jquery, use symlink instead of embedded
+    copy
+  * Ensure proper migration from -dbg package using "dh_strip
+    --dbgsym-migration"
+  * Bump debhelper dependency for --dbgsym-migration
+  * Enable ibus support (Closes: #822924)
+  * d/patches:
+    - Add bug_822210_fix_sdl2-config.cmake_whitespace.patch: Fix upstream
+      problem with sdl2-config.cmake (Closes: #822210)
+
+  [ Gianfranco Costamagna ]
+  * Fix insecure VCS fields.
+  * Re-import the same tarball without SDL-qsort.c file.
+    - the license issue is fixed already, because the original
+      maintainer relicensed it (so we are adding it as a patch now)
+      this repack can be removed in the next upstream tarball import.
+      (Closes: #814276).
+
+ -- Manuel A. Fernandez Montecelo <mafm@debian.org>  Thu, 19 May 2016 11:48:54 +0100
+
+libsdl2 (2.0.4+dfsg1-2) unstable; urgency=low
+
+  * Upload to unstable
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 18 Jan 2016 16:36:59 +0100
+
+libsdl2 (2.0.4+dfsg1-1) experimental; urgency=medium
+
+  * Team upload.
+  * run wrap-and-sort -sa.
+  * Fix copyright lintian warning.
+  * Update copyright to new release.
+  * New upstream release (Closes: #788688, #798265, #788540)
+    - Drop patches use-default-screen and
+      fix_joystick_misc_axes.diff, applied upstream.
+  * Add Files-Excluded keyword to copyright file, allowing to
+    import a new release with uscan command. (Closes: #804662)
+  * Create new -doc package, and move examples into it (Closes: #739430).
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Sun, 03 Jan 2016 12:12:54 +0100
+
+libsdl2 (2.0.2+dfsg1-8) unstable; urgency=medium
+
+  * Change to improve build reproducibility: tar file permission modes.
+    Thanks Reiner Herrmann. (Closes: #803578)
+  * Build with sndio support (Closes: #799707)
+  * Update d/copyright to adapt to minor changes in code and files moved
+    around, and quell lintian (spelling-error-in-copyright,
+    wildcard-matches-nothing-in-dep5-copyright and
+    unused-file-paragraph-in-dep5-copyright)
+
+ -- Manuel A. Fernandez Montecelo <mafm@debian.org>  Sun, 01 Nov 2015 00:55:03 +0000
+
+libsdl2 (2.0.2+dfsg1-7) unstable; urgency=medium
+
+  * Bump Policy Standards-Version to 3.9.6 (no changes needed)
+  * Remove Barry deFreese from uploaders
+  * Change for reproducible builds: use "--owner=0 --group=0" when
+    creating the "examples" tar file (Closes: #777186).  Thanks Chris Lamb
+    and rest of the Reproducible Builds team for the analysis and patch
+    suggested.
+
+ -- Manuel A. Fernandez Montecelo <mafm@debian.org>  Mon, 27 Apr 2015 22:53:31 +0100
 
 libsdl2 (2.0.2+dfsg1-6) unstable; urgency=medium
 
